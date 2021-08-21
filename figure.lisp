@@ -18,5 +18,9 @@
 (defmethod render-figure (frame)
   (with-slots ((figure figure) (s from) (e end)) frame
     (loop for i from s to e by *dif*
-	  collect `(,i . ,(funcall figure i)))))
+	  collect (restart-case
+		      `(,i . ,(funcall figure i))
+		    (set-as-undefined (x)
+		      (declare (ignore x))
+		      nil)))))
 
