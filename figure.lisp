@@ -2,9 +2,8 @@
 (in-package :cl-termgraph)
 
 
-(defparameter *dif* 0.12)
+(defparameter *dif* 0.1)
 
-; soft <-> heavy 1 <-> 6th
 (defparameter *positive-lines* `("⠶" "⣠" "⣐" "⠞" "⣨" "⢼" "⠿"))
 (defparameter *negative-lines* `("⠶" "⠦" "⠧" "⠳" "⠧" "⢫" "⠿"))
 
@@ -34,7 +33,6 @@
 		      (declare (ignore x))
 			       `(,i . nil))
 		    (:no-error (x) `(,i . ,x))))))
-
 
 (defun max-points (points)
   (loop for i in (map 'list #'(lambda (p) (cdr p)) points)
