@@ -57,12 +57,11 @@
        ((and (<= 1.5 ti) (< ti 3.0)  (fifth *positive-lines*)))
        ((and (<= 3.0 ti) (< ti 4.5)    (sixth *positive-lines*)))
        ((>= ti 4.5) (seventh *positive-lines*))
-
-       ((and (<= -0.5 ti) (< ti 0)) (second *negative-lines*))
-       ((and (<= -1.0 ti) (< ti -0.5) (third *negative-lines*)))
-       ((and (<= -1.5 ti) (< ti -1.0)) (fourth *negative-lines*))
-       ((and (<= -1.5 ti) (< ti -3.0)) (fifth *negative-lines*))
-       ((and (<= -3.0 ti) (< ti -4.5)) (sixth *negative-lines*))
+       ((and (< -0.5 ti) (<= ti 0)) (second *negative-lines*))
+       ((and (< -1.0 ti) (<= ti -0.5) (third *negative-lines*)))
+       ((and (< -1.5 ti) (<= ti -1.0)) (fourth *negative-lines*))
+       ((and (< -3.0 ti) (<= ti -1.5)) (fifth *negative-lines*))
+       ((and (< -4.5 ti) (<= ti -3.0)) (sixth *negative-lines*))
        ((<= ti -4.5) (seventh *negative-lines*)))))
 
 (defmacro tilt (p1 p2)
@@ -80,9 +79,10 @@
   (with-slots ((s from) (e end) (x width) (y height)) frame
     (let* ((points (collect-figure-points frame))
 	   (figure-size (+ (abs e) (abs s)))
-	   (expa-rate-x (/ x figure-size)) 
+	   (expa-rate-x (if (= figure-size 0) 1 (/ x figure-size)))
 	   (expa-rate-y (/ y (mbind (max min) (maxmin-points points)
-			       (+ (abs max) (abs min)))))
+			       (let ((sum (+ (abs max) (abs min))))
+				 (if (= sum 0) y sum)))))
 	   (expaed-points (map 'list #'(lambda (p)
 					 `(,(* (car p) expa-rate-x) .
 					   ,(* (cdr p) expa-rate-y))) points))
@@ -104,14 +104,9 @@
 
 (defun render (frame pallet)
   (with-output-to-string (graph)
-    (loop for x from 0 to (slot-value frame 'width)
-	  do (loop for y from 0 to (slot-value frame 'height)
-      	     do (write-string (aref pallet x (- (slot-value frame 'height) y)) graph))
+    (loop for y from 0 to (slot-value frame 'width)
+	  do (loop for x from 0 to (slot-value frame 'height)
+		   do (write-string (aref pallet x
+					  (- (slot-value frame 'height) y)) graph))
 	     (write-char #\Newline graph))))
 
-(plot (make-instance 'figure-graph-frame :figure
-						    #'(lambda (x) (expt x 2))
-						    :from -2
-						    :end 2
-				                    :width 10
-				                    :height 10) nil)
