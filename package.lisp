@@ -1,4 +1,4 @@
 
 (defpackage :cl-termgraph
-  (:use :cl)
+  (:use :cl :cl-ansi-text)
   (:export nil))

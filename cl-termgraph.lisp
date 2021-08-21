@@ -20,11 +20,9 @@
 	   :initarg :height
 	   :initform nil)))
 
-(defmethod fill-with-blank ((frame simple-graph-frame))
+(defmacro graphline (str)
+  `(white ,str :style :background))
+
+(defmethod draw-graph-base ((frame simple-graph-frame))
   (with-slots ((x width) (y height)) frame
-    (loop for i from 1 to y
-          do (loop for j from 1 to x
-		   do (princ (white " " :style :background)))
-	  do (princ #\Newline))))
-
-
+    (make-array `(,(1+ x) ,(1+ y)) :initial-element (graphline "  "))))
