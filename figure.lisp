@@ -2,10 +2,10 @@
 (in-package :cl-termgraph)
 
 
-(defparameter *dif* 0.1)
+(defparameter *dif* 0.2)
 
-(defparameter *positive-lines* `("⠶" "⣠" "⣐" "⠞" "⣨" "⢼" "⠿"))
-(defparameter *negative-lines* `("⠶" "⠦" "⠧" "⠳" "⠧" "⢫" "⠿"))
+(defparameter *positive-lines* `("⠒" "⠤" "⡤" "⡇" "⡇" "⡇" "⡇"))
+(defparameter *negative-lines* `("⠒" "⠤" "⠓" "⡇" "⢤" "⡇" "⡇"))
 
 (defgeneric plot (frame pallet))
 (defmacro mbind (&rest args)
@@ -70,6 +70,7 @@
 (defmacro 3p-tilt-ave (p1 p2 p3)
   `(/ (+ (tilt ,p1 ,p2) (tilt ,p2 ,p3)) 2))
 
+
 (defmethod plot ((frame figure-graph-frame) (pallet (eql nil)))
   (plot frame (draw-graph-base frame)))
 
@@ -97,7 +98,7 @@
 		 (setf (aref pallet
 			     (+ x xmin-abs)
 			     (+ y ymin-abs))
-			      (white (red next-line) :style :background))))
+			      (red next-line))))
       (princ (render frame pallet)))) nil)
 
 (defun render (frame pallet)

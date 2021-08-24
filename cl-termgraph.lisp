@@ -25,4 +25,4 @@
 
 (defmethod draw-graph-base ((frame simple-graph-frame))
   (with-slots ((x width) (y height)) frame
-    (make-array `(,(1+ x) ,(1+ y)) :initial-element (graphline "  "))))
+    (make-array `(,(1+ x) ,(1+ y)) :initial-element " ")))
