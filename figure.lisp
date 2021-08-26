@@ -3,9 +3,8 @@
 
 
 (defparameter *dif* 0.2)
-
-(defparameter *positive-lines* `("⠒" "⠤" "⡤" "⡇" "⡇" "⡇" "⡇"))
-(defparameter *negative-lines* `("⠒" "⠤" "⠓" "⡇" "⢤" "⡇" "⡇"))
+(defparameter *positive-lines* `("⠒" "⠤" "⡤" "⠚" "⡇" "⡇" "⡇"))
+(defparameter *negative-lines* `("⠒" "⠤" "⠓" "⢤" "⡇" "⡇" "⡇"))
 
 (defgeneric plot (frame pallet))
 (defmacro mbind (&rest args)
@@ -48,15 +47,15 @@
 (defmacro choose-line (p1 p2 p3)
   `(let ((ti (3p-tilt-ave ,p1 ,p2 ,p3)))
      (cond
-       ((and (= ti 0) (first *positive-lines*)))
+       ((= ti 0) (first *positive-lines*))
        ((and (< 0 ti) (< ti 0.5))    (second *positive-lines*))
        ((and (<= 0.5 ti) (< ti 1.0)) (third *positive-lines*))
-       ((and (<= 1.0 ti) (< ti 1.5)  (fourth *positive-lines*)))
-       ((and (<= 1.5 ti) (< ti 3.0)  (fifth *positive-lines*)))
-       ((and (<= 3.0 ti) (< ti 4.5)    (sixth *positive-lines*)))
+       ((and (<= 1.0 ti) (< ti 1.5))  (fourth *positive-lines*))
+       ((and (<= 1.5 ti) (< ti 3.0))  (fifth *positive-lines*))
+       ((and (<= 3.0 ti) (< ti 4.5))    (sixth *positive-lines*))
        ((>= ti 4.5) (seventh *positive-lines*))
        ((and (< -0.5 ti) (<= ti 0)) (second *negative-lines*))
-       ((and (< -1.0 ti) (<= ti -0.5) (third *negative-lines*)))
+       ((and (< -1.0 ti) (<= ti -0.5)) (third *negative-lines*))
        ((and (< -1.5 ti) (<= ti -1.0)) (fourth *negative-lines*))
        ((and (< -3.0 ti) (<= ti -1.5)) (fifth *negative-lines*))
        ((and (< -4.5 ti) (<= ti -3.0)) (sixth *negative-lines*))
@@ -98,14 +97,14 @@
 		 (setf (aref pallet
 			     (+ x xmin-abs)
 			     (+ y ymin-abs))
-			      (red next-line))))
+		       (red next-line))))
+	  
       (princ (render frame pallet)))) nil)
 
 (defun render (frame pallet)
   (with-output-to-string (graph)
-    (loop for y from 0 to (slot-value frame 'width)
+    (loop for y from 0 to (slot-value frame 'height)
 	  do (loop for x from 0 to (slot-value frame 'height)
-		   do (write-string (aref pallet x
-					  (- (slot-value frame 'height) y)) graph))
+		   do (write-string (aref pallet x (- (slot-value frame 'height) y)) graph))
 	     (write-char #\Newline graph))))
 
