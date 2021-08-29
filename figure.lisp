@@ -24,6 +24,20 @@
 	 :initarg :name
 	 :initform nil)))
 
+(defclass parameter-graph-frame (figure-graph-frame)
+  ((parameter :accessor parameter
+	      :initarg :parameter
+	      :initform nil)
+   (by :accessor move-by
+       :initarg :by
+       :initform 1)
+   (pstart :accessor pstart
+	   :initarg :pstart
+	   :initform -3)
+   (pend :accessor pend
+	 :initarg :pend
+	 :initform 3)))
+
 (defmethod collect-figure-points ((frame figure-graph-frame))
   (with-slots ((figure figure) (s from) (e end)) frame
      (loop for i from s to e by *dif*
@@ -70,7 +84,7 @@
   `(/ (+ (tilt ,p1 ,p2) (tilt ,p2 ,p3)) 2))
 
 
-(defmethod plot ((frame figure-graph-frame) (pallet (eql nil)))
+(defmethod plot ((frame simple-graph-frame) (pallet (eql nil)))
   (plot frame (draw-graph-base frame)))
 
 (defmethod plot ((frame figure-graph-frame) pallet)
@@ -100,6 +114,35 @@
 		       (red next-line))))
 	  
       (princ (render frame pallet)))) nil)
+
+(defmethod plot ((frame parameter-graph-frame) pallet)
+  (with-slots ((width width)
+	       (height height)
+	       (figure figure)
+	       (from from)
+	       (end end)
+	       (name name)
+	       (parameter parameter)
+	       (pstart pstart)
+	       (pend pend)
+	       (by by)) frame
+    (macrolet ((let-parameter (p value f)
+		 ; f(x,a) => f(x)
+		 `(lambda (@) (funcall ,f @ ,value))))
+      (loop for i from pstart to pend by by
+	    do (fresh-line)
+	       (format t "--Plotting ~a=~a -----" parameter i)
+	       (fresh-line)
+	       (plot (make-instance 'figure-graph-frame
+				    :from from
+				    :end end
+				    :name name
+				    :width width
+				    :height height
+				    :figure (let-parameter parameter i figure)
+				    :from from
+				    :end end) pallet)
+	       (sleep by)))))
 
 (defun render (frame pallet)
   (with-output-to-string (graph)
