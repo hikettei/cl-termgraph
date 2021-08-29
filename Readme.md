@@ -18,3 +18,5 @@ A plotting library in terminal for Common Lisp!
 ・グラフの座標を数字で表示したい
 
 ・アニメーション実装して、パラメーター動かせるようにしたい
+
+・バグ修正とか
