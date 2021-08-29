@@ -2,7 +2,7 @@
 (in-package :cl-termgraph)
 
 
-(defparameter *dif* 0.2)
+(defparameter *dif* 1/3)
 (defparameter *positive-lines* `("⠒" "⠤" "⡤" "⠚" "⡇" "⡇" "⡇"))
 (defparameter *negative-lines* `("⠒" "⠤" "⠓" "⢤" "⡇" "⡇" "⡇"))
 
@@ -95,11 +95,15 @@
 	   (expa-rate-y (/ y (mbind (max min) (maxmin-points points)
 			       (let ((sum (+ (abs max) (abs min))))
 				 (if (= sum 0) y sum)))))
+	   (expa-rate (- (max expa-rate-x expa-rate-y) 2))
 	   (expaed-points (map 'list #'(lambda (p)
 					 `(,(* (car p) expa-rate-x) .
-					   ,(* (cdr p) expa-rate-y))) points))
+					   ,(* (cdr p) 1))) points))
 	   (xmin-abs (abs (round (caar expaed-points))))
 	   (ymin-abs (abs (round (min-points expaed-points)))))
+
+      (loop for i from 0 to (1- x)
+	    do (setf (aref pallet i (round (funcall (slot-value frame 'figure) 0)))  " "))
       
       (loop for i from 0 to (1- (length expaed-points))
 	    do (let* ((p1 (if (= i 0 ) nil (nth (1- i) expaed-points)))
@@ -111,7 +115,7 @@
 		 (setf (aref pallet
 			     (+ x xmin-abs)
 			     (+ y ymin-abs))
-		       (red next-line))))
+		       (blue next-line))))
 	  
       (princ (render frame pallet)))) nil)
 
@@ -131,7 +135,7 @@
 		 `(lambda (@) (funcall ,f @ ,value))))
       (loop for i from pstart to pend by by
 	    do (fresh-line)
-	       (format t "--Plotting ~a=~a -----" parameter i)
+	       (format t "|====|Plotting ~a=~a |=====|" parameter i)
 	       (fresh-line)
 	       (plot (make-instance 'figure-graph-frame
 				    :from from
@@ -142,12 +146,12 @@
 				    :figure (let-parameter parameter i figure)
 				    :from from
 				    :end end) pallet)
-	       (sleep by)))))
+	       (sleep (/ by 2))))))
 
 (defun render (frame pallet)
   (with-output-to-string (graph)
     (loop for y from 0 to (slot-value frame 'height)
-	  do (loop for x from 0 to (slot-value frame 'height)
+	  do (loop for x from 0 to (slot-value frame 'width)
 		   do (write-string (aref pallet x (- (slot-value frame 'height) y)) graph))
 	     (write-char #\Newline graph))))
 
