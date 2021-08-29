@@ -3,8 +3,8 @@
 
 
 (defparameter *dif* 1/3)
-(defparameter *positive-lines* `("⠒" "⠤" "⡤" "⠚" "⡇" "⡇" "⡇"))
-(defparameter *negative-lines* `("⠒" "⠤" "⠓" "⢤" "⡇" "⡇" "⡇"))
+(defparameter *positive-lines* `("⠒⠒" "⣠⣤" "⣠⣰" "⣠⣼" "⡜⡜" "⣼⡜" "⡇⡇"))
+(defparameter *negative-lines* `("⠒⠒" "⣤⣄" "⣆⣄" "⣧⣄" "⢣⢣" "⢣⣧" "⡇⡇"))
 
 (defgeneric plot (frame pallet))
 (defmacro mbind (&rest args)
@@ -58,8 +58,8 @@
 (defun maxmin-points (points)
   (values (max-points points) (min-points points)))
 
-(defmacro choose-line (p1 p2 p3)
-  `(let ((ti (3p-tilt-ave ,p1 ,p2 ,p3)))
+(defmacro choose-line (p1 p2 p3 &optional (opt 0))
+  `(let ((ti (+ ,opt (3p-tilt-ave ,p1 ,p2 ,p3))))
      (cond
        ((= ti 0) (first *positive-lines*))
        ((and (< 0 ti) (< ti 0.5))    (second *positive-lines*))
@@ -84,7 +84,7 @@
   `(/ (+ (tilt ,p1 ,p2) (tilt ,p2 ,p3)) 2))
 
 
-(defmethod plot ((frame simple-graph-frame) (pallet (eql nil)))
+(defmethod plot ((frame figure-graph-frame) (pallet (eql nil)))
   (plot frame (draw-graph-base frame)))
 
 (defmethod plot ((frame figure-graph-frame) pallet)
@@ -103,7 +103,9 @@
 	   (ymin-abs (abs (round (min-points expaed-points)))))
 
       (loop for i from 0 to (1- x)
-	    do (setf (aref pallet i (round (funcall (slot-value frame 'figure) 0)))  " "))
+	    do (setf
+		(aref pallet i (round (funcall (slot-value frame 'figure) 0)))
+		"  "))
       
       (loop for i from 0 to (1- (length expaed-points))
 	    do (let* ((p1 (if (= i 0 ) nil (nth (1- i) expaed-points)))
@@ -111,11 +113,22 @@
 		      (p3 (nth (1+ i) expaed-points))
 		      (next-line (choose-line p1 p2 p3))
 		      (x (round (car p2)))
-		      (y (round (cdr p2))))
+		      (y (round (cdr p2)))
+		      (ave (3p-tilt-ave p1 p2 p3)))
 		 (setf (aref pallet
 			     (+ x xmin-abs)
 			     (+ y ymin-abs))
-		       (blue next-line))))
+		       (blue next-line))
+		 (if (and (or (> ave 1.5)
+			      (< ave -1.5))
+			  (equal (aref pallet
+			     (+ x xmin-abs)
+			     (+ y ymin-abs -1)) "  "))
+		     (setf (aref pallet
+			     (+ x xmin-abs)
+			     (+ y ymin-abs -1))
+			   (blue (choose-line p1 p2 p3 (if (> ave 0)
+							   1.51 -1.51)))))))
 	  
       (princ (render frame pallet)))) nil)
 
