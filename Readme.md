@@ -3,9 +3,13 @@
 A plotting library in terminal for Common Lisp!
 
 # Examples 
-### Plotting y=sinx
-<img src="https://user-images.githubusercontent.com/88639579/131205136-a643d219-0672-4848-b037-11dd2cf7c617.png" width="650">
+### Plotting y=a*sinx
+![demo](https://gyazo.com/9bdd41508121401e6cca0c474e1f2d24/raw)
 
+### Plotting y=x^2
+<img src="https://i.gyazo.com/077997fc6c491cbf3c2f85c26db1f964.png" width="340">
+
+### Plotting
 ### Todo
 ・x軸y軸を表示したい
 
